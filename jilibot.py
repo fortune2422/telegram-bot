@@ -12,8 +12,6 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
     keyboard = [
         [
             InlineKeyboardButton("🎮 Registre uma conta", url=REGISTER_URL),
-        ],
-        [
             InlineKeyboardButton("🟢 Link do site oficial", url=OFFICIAL_URL),
         ],
         [
