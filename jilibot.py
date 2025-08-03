@@ -1,49 +1,58 @@
-import asyncio
-from telegram import Update, InlineKeyboardButton, InlineKeyboardMarkup, Bot, BotCommand
+from telegram import Update, InlineKeyboardButton, InlineKeyboardMarkup, BotCommand
 from telegram.ext import ApplicationBuilder, CommandHandler, ContextTypes
-from telegram.error import TelegramError
+import os
 
-# Bot Token
 TOKEN = "8331605813:AAFHs5vaFopD72LZOD-c1YsD4Ug2E47mbwg"
 
-# 网址
+# URLs
 REGISTER_URL = "https://jili707.co/register"
 OFFICIAL_URL = "https://jili707.co"
 CUSTOMER_SERVICE_URL = "https://magweb.meinuoka.com/Web/im.aspx?_=t&accountid=133283"
 IOS_DOWNLOAD_URL = "https://images.6929183.com/wsd-images-prod/jili707f2/merchant_resource/mobileconfig/jili707f2_2.4.3_20250725002905.mobileconfig"
 ANDROID_DOWNLOAD_URL = "https://images.847830.com/wsd-images-prod/jili707f2/merchant_resource/android/jili707f2_2.4.68_20250725002907.apk"
 
-# 设置菜单
-async def set_bot_commands(bot):
-    commands = [
-        BotCommand("register", "🎮 Registre uma conta"),
-        BotCommand("site", "🟢 Link do site oficial"),
-        BotCommand("cliente", "🧑‍💼 atendimento ao Cliente"),
-        BotCommand("android", "📱 Android"),
-        BotCommand("ios", "🍏 iOS"),
-    ]
-    await bot.set_my_commands(commands)
-
 # /start 指令
 async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
     keyboard = [
-        [InlineKeyboardButton("🎮 Registre uma conta", url=REGISTER_URL),
-         InlineKeyboardButton("🟢 Link do site oficial", url=OFFICIAL_URL)],
-        [InlineKeyboardButton("📱 ANDROID DOWNLOAD", url=ANDROID_DOWNLOAD_URL),
-         InlineKeyboardButton("📱🍏 IOS DOWNLOAD", url=IOS_DOWNLOAD_URL)],
-        [InlineKeyboardButton("🧑‍💼 atendimento ao Cliente", url=CUSTOMER_SERVICE_URL)],
+        [
+            InlineKeyboardButton("🎮 Registre uma conta", url=REGISTER_URL),
+            InlineKeyboardButton("🟢 Link do site oficial", url=OFFICIAL_URL)
+        ],
+        [
+            InlineKeyboardButton("📱 ANDROID DOWNLOAD", url=ANDROID_DOWNLOAD_URL),
+            InlineKeyboardButton("📱🍏 IOS DOWNLOAD", url=IOS_DOWNLOAD_URL)
+        ],
+        [
+            InlineKeyboardButton("🧑‍💼 atendimento ao Cliente", url=CUSTOMER_SERVICE_URL)
+        ]
     ]
     reply_markup = InlineKeyboardMarkup(keyboard)
 
-    welcome_text = (
+    text = (
         "Bem-vindo ao bot oficial do jili707.co, um produto de apostas baseado na plataforma jili707.\n"
         "Aqui, você pode experimentar toda a emoção das apostas e ainda participar de campanhas de promoção,\n"
         "para ganhar grandes prêmios em dinheiro.\n\n"
         "Seja bem-vindo ao bot oficial de apostas do Jili707!"
     )
-    await update.message.reply_text(welcome_text, reply_markup=reply_markup)
+    await update.message.reply_text(text, reply_markup=reply_markup)
 
-# 其他指令响应
+# 设置菜单命令
+async def set_bot_commands(application):
+    commands = [
+        BotCommand("register", "🎮 Registre uma conta"),
+        BotCommand("site", "🟢 Link do site oficial"),
+        BotCommand("cliente", "🧑‍💼 atendimento ao Cliente"),
+        BotCommand("android", "📱 Android"),
+        BotCommand("ios", "🍏 iOS")
+    ]
+    await application.bot.set_my_commands(commands)
+
+# 启动时运行的初始化函数
+async def on_startup(application):
+    await set_bot_commands(application)
+    print("✅ 菜单命令已设置")
+
+# 其他指令
 async def register(update: Update, context: ContextTypes.DEFAULT_TYPE):
     await update.message.reply_text(f"🔗 {REGISTER_URL}")
 
@@ -59,11 +68,8 @@ async def android(update: Update, context: ContextTypes.DEFAULT_TYPE):
 async def ios(update: Update, context: ContextTypes.DEFAULT_TYPE):
     await update.message.reply_text(f"🍏 {IOS_DOWNLOAD_URL}")
 
-# 主程序入口
-async def run_bot():
+if __name__ == "__main__":
     app = ApplicationBuilder().token(TOKEN).build()
-
-    await set_bot_commands(app.bot)
 
     app.add_handler(CommandHandler("start", start))
     app.add_handler(CommandHandler("register", register))
@@ -72,9 +78,4 @@ async def run_bot():
     app.add_handler(CommandHandler("android", android))
     app.add_handler(CommandHandler("ios", ios))
 
-    print("🤖 Bot is running on Render ...")
-    await app.run_polling()
-
-if __name__ == "__main__":
-    loop = asyncio.get_event_loop()
-    loop.run_until_complete(run_bot())
+    app.run_polling(on_startup=on_startup)
