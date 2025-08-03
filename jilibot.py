@@ -1,5 +1,19 @@
 from telegram import Update, InlineKeyboardButton, InlineKeyboardMarkup
 from telegram.ext import ApplicationBuilder, CommandHandler, ContextTypes
+from telegram import Bot
+from telegram.error import TelegramError
+
+# 把这行换成你自己的 Bot Token
+TOKEN = "8331605813:AAFHs5vaFopD72LZOD-c1YsD4Ug2E47mbwg"
+bot = Bot(token=TOKEN)
+
+try:
+    # 清除之前的 webhook 或 polling 实例
+    bot.delete_webhook(drop_pending_updates=True)
+    print("✅ 已清除之前的会话，避免冲突")
+except TelegramError as e:
+    print(f"⚠️ 清除失败：{e}")
+
 
 # 替换成你们网站的地址
 REGISTER_URL = "https://jili707.co/register"
