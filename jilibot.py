@@ -115,22 +115,22 @@ async def handle_text(update: Update, context: ContextTypes.DEFAULT_TYPE):
     else:
         await update.message.reply_text("❓ Comando não reconhecido. Por favor, use os botões ou comandos disponíveis.")
         
-# 初始化时设置菜单命令和聊天菜单按钮
+# 👇 定义 post_init 函数（执行初始化动作，比如设置菜单命令和 OPEN 按钮）
 async def post_init(application):
+    print("⚙️ 正在设置 Bot 菜单按钮...")  # 调试用，部署时可删
+
+    # 设置菜单命令
     await set_bot_commands(application)
 
-    try:
-        # 设置聊天菜单为 WebApp 按钮
-        await application.bot.set_chat_menu_button(
-            chat_id=None,  # 💡 关键点：设置全局默认按钮
-            menu_button=MenuButtonWebApp(
-                text="OPEN",
-                web_app=WebAppInfo(url=OFFICIAL_URL)  # 指向你的网站即可
-            )
+    # 设置全局 OPEN 按钮
+    await application.bot.set_chat_menu_button(
+        chat_id=None,  # 💡 全局用户都看到
+        menu_button=MenuButtonWebApp(
+            text="OPEN",
+            web_app=WebAppInfo(url=OFFICIAL_URL)
         )
-        print("✅ OPEN 按钮已设置")
-    except Exception as e:
-        print(f"❌ 设置 OPEN 按钮失败: {e}")
+    )
+    print("✅ OPEN 按钮已设置")  # 可选调试日志
 
 
 # 主程序
@@ -148,10 +148,6 @@ if __name__ == "__main__":
     # 文本按钮 handler
     app.add_handler(MessageHandler(filters.TEXT & ~filters.COMMAND, handle_text))
     
-async def post_init(application):
-    print("⚙️ 正在设置 Bot 菜单按钮...")  # 临时调试输出
-    ...
-
     # 设置菜单命令
     app.post_init = post_init
 
