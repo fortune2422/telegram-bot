@@ -30,17 +30,9 @@ ANDROID_DOWNLOAD_URL = "https://images.847830.com/wsd-images-prod/jili707f2/merc
 # /start handler
 async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
     keyboard = [
-        [
-            KeyboardButton("🎮 Registre uma conta", url=REGISTER_URL),
-            KeyboardButton("🟢 Link do site oficial", url=OFFICIAL_URL)
-        ],
-        [
-            KeyboardButton("📱 ANDROID DOWNLOAD", url=ANDROID_DOWNLOAD_URL),
-            KeyboardButton("📱🍏 IOS DOWNLOAD", url=IOS_DOWNLOAD_URL)
-        ],
-        [
-            KeyboardButton("🧑‍💼 atendimento ao Cliente", url=CUSTOMER_SERVICE_URL)
-        ]
+        [KeyboardButton("🎮 Registre uma conta"), KeyboardButton("🟢 Link do site oficial")],
+        [KeyboardButton("📱 ANDROID DOWNLOAD"), KeyboardButton("🍏 IOS DOWNLOAD")],
+        [KeyboardButton("🧑‍💼 atendimento ao Cliente")],
     ]
     reply_markup = ReplyKeyboardMarkup(keyboard, resize_keyboard=True)
 
@@ -48,7 +40,7 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
         "Bem-vindo ao bot oficial do jili707.co, um produto de apostas baseado na plataforma jili707.\n"
         "Aqui, você pode experimentar toda a emoção das apostas e ainda participar de campanhas de promoção,\n"
         "para ganhar grandes prêmios em dinheiro.\n\n"
-        "Seja bem-vindo ao bot oficial de apostas do Jili707!"
+        "Escolha uma opção abaixo 👇"
     )
     await update.message.reply_text(text, reply_markup=reply_markup)
 
@@ -64,38 +56,43 @@ async def set_bot_commands(application):
     await application.bot.set_my_commands(commands)
     print("✅ 菜单命令已设置")
 
-# 各个指令处理
-async def register(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    await update.message.reply_text(f"🔗 {REGISTER_URL}")
+# 手动命令处理函数（命令或点击按钮时调用）
+async def handle_text(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    text = update.message.text.strip().lower()
 
-async def site(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    await update.message.reply_text(f"🔗 {OFFICIAL_URL}")
+    if "registre" in text or text.startswith("/register"):
+        await update.message.reply_text(f"🎮 Registre uma conta: {REGISTER_URL}")
+    elif "site" in text or text.startswith("/site"):
+        await update.message.reply_text(f"🟢 Link do site oficial: {OFFICIAL_URL}")
+    elif "cliente" in text or text.startswith("/cliente"):
+        await update.message.reply_text(f"🧑‍💼 Atendimento ao Cliente: {CUSTOMER_SERVICE_URL}")
+    elif "android" in text or text.startswith("/android"):
+        await update.message.reply_text(f"📱 Android Download: {ANDROID_DOWNLOAD_URL}")
+    elif "ios" in text or text.startswith("/ios"):
+        await update.message.reply_text(f"🍏 iOS Download: {IOS_DOWNLOAD_URL}")
+    else:
+        await update.message.reply_text("❓ Comando não reconhecido. Por favor, use os botões ou comandos disponíveis.")
 
-async def cliente(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    await update.message.reply_text(f"📞 {CUSTOMER_SERVICE_URL}")
-
-async def android(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    await update.message.reply_text(f"📱 {ANDROID_DOWNLOAD_URL}")
-
-async def ios(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    await update.message.reply_text(f"🍏 {IOS_DOWNLOAD_URL}")
-
-# 启动程序
+# 主程序
 if __name__ == "__main__":
     app = ApplicationBuilder().token(TOKEN).build()
 
-    # 添加指令处理器
+    # 添加指令
     app.add_handler(CommandHandler("start", start))
-    app.add_handler(CommandHandler("register", register))
-    app.add_handler(CommandHandler("site", site))
-    app.add_handler(CommandHandler("cliente", cliente))
-    app.add_handler(CommandHandler("android", android))
-    app.add_handler(CommandHandler("ios", ios))
+    app.add_handler(CommandHandler("register", handle_text))
+    app.add_handler(CommandHandler("site", handle_text))
+    app.add_handler(CommandHandler("cliente", handle_text))
+    app.add_handler(CommandHandler("android", handle_text))
+    app.add_handler(CommandHandler("ios", handle_text))
 
-    # 设置菜单命令
+    # 添加按钮点击（文本匹配）处理
+    from telegram.ext import MessageHandler, filters
+    app.add_handler(MessageHandler(filters.TEXT & ~filters.COMMAND, handle_text))
+
+    # 设置菜单
     app.post_init = set_bot_commands
 
-    # 启动 webhook 模式（适配 Render）
+    # 启动 Webhook（Render 部署）
     app.run_webhook(
         listen="0.0.0.0",
         port=int(os.environ.get("PORT", 8443)),
