@@ -17,6 +17,9 @@ from telegram.ext import (
 )
 import telegram
 import os
+import random
+import string
+import aiohttp
 
 print("🔍 当前 python-telegram-bot 版本:", telegram.__version__)
 
@@ -32,6 +35,37 @@ OFFICIAL_URL = "https://jili707.co"
 CUSTOMER_SERVICE_URL = "https://magweb.meinuoka.com/Web/im.aspx?_=t&accountid=133283"
 IOS_DOWNLOAD_URL = "https://images.6929183.com/wsd-images-prod/jili707f2/merchant_resource/mobileconfig/jili707f2_2.4.3_20250725002905.mobileconfig"
 ANDROID_DOWNLOAD_URL = "https://images.847830.com/wsd-images-prod/jili707f2/merchant_resource/android/jili707f2_2.4.68_20250725002907.apk"
+
+# 自动注册功能
+def random_username():
+    return "jili_" + ''.join(random.choices(string.digits, k=6))
+
+def random_password():
+    return ''.join(random.choices(string.ascii_letters + string.digits, k=8))
+
+async def auto_register(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    username = random_username()
+    password = random_password()
+
+    form = {
+        "username": username,
+        "password": password,
+        "confirm_password": password
+    }
+
+    try:
+        async with aiohttp.ClientSession() as session:
+            async with session.post(REGISTER_URL, data=form) as resp:
+                text = await resp.text()
+                if "login" in text.lower() or "success" in text.lower():
+                    await update.message.reply_text(
+                        f"✅ Conta criada com sucesso!\n👤 Usuário: `{username}`\n🔐 Senha: `{password}`",
+                        parse_mode="Markdown"
+                    )
+                else:
+                    await update.message.reply_text("❌ Falha ao registrar. Tente manualmente em: https://jili707.co/register")
+    except Exception as e:
+        await update.message.reply_text("❌ Erro ao registrar. Tente novamente mais tarde.")
 
 # /start handler
 async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
@@ -86,10 +120,8 @@ async def set_bot_commands(application):
 async def handle_text(update: Update, context: ContextTypes.DEFAULT_TYPE):
     text = update.message.text.strip().lower()
 
-    if "registre" in text or text.startswith("/register"):
-        keyboard = [[InlineKeyboardButton("🎮 Registrar agora", url=REGISTER_URL)]]
-        reply_markup = InlineKeyboardMarkup(keyboard)
-        await update.message.reply_text("🎮 Registre uma conta:\nClique abaixo para criar sua conta 👇", reply_markup=reply_markup)
+    if any(kw in text for kw in ["register", "registar", "account", "注册", "conta", "criar conta"]):
+        await auto_register(update, context)
 
     elif "site" in text or text.startswith("/site"):
         keyboard = [[InlineKeyboardButton("🟢 Acessar site oficial", url=OFFICIAL_URL)]]
@@ -143,6 +175,7 @@ if __name__ == "__main__":
     app.add_handler(CommandHandler("cliente", handle_text))
     app.add_handler(CommandHandler("android", handle_text))
     app.add_handler(CommandHandler("ios", handle_text))
+    app.add_handler(CommandHandler("autoreg", auto_register))
 
     # 文本按钮 handler
     app.add_handler(MessageHandler(filters.TEXT & ~filters.COMMAND, handle_text))
