@@ -80,22 +80,38 @@ async def set_bot_commands(application):
     await application.bot.set_my_commands(commands)
     print("✅ 菜单命令已设置")
 
-# 文本按钮命令
+## 文本按钮命令
 async def handle_text(update: Update, context: ContextTypes.DEFAULT_TYPE):
     text = update.message.text.strip().lower()
 
     if "registre" in text or text.startswith("/register"):
-        await update.message.reply_text(f"🎮 Registre uma conta: {REGISTER_URL}")
+        keyboard = [[InlineKeyboardButton("🎮 Registrar agora", url=REGISTER_URL)]]
+        reply_markup = InlineKeyboardMarkup(keyboard)
+        await update.message.reply_text("🎮 Registre uma conta:\nClique abaixo para criar sua conta 👇", reply_markup=reply_markup)
+
     elif "site" in text or text.startswith("/site"):
-        await update.message.reply_text(f"🟢 Link do site oficial: {OFFICIAL_URL}")
+        keyboard = [[InlineKeyboardButton("🟢 Acessar site oficial", url=OFFICIAL_URL)]]
+        reply_markup = InlineKeyboardMarkup(keyboard)
+        await update.message.reply_text("🟢 Link do site oficial:\nClique abaixo para acessar 👇", reply_markup=reply_markup)
+
     elif "cliente" in text or text.startswith("/cliente"):
-        await update.message.reply_text(f"🧑‍💼 Atendimento ao Cliente: {CUSTOMER_SERVICE_URL}")
+        keyboard = [[InlineKeyboardButton("🧑‍💼 Falar com o suporte", url=CUSTOMER_SERVICE_URL)]]
+        reply_markup = InlineKeyboardMarkup(keyboard)
+        await update.message.reply_text("🧑‍💼 Atendimento ao Cliente:\nClique abaixo para falar com o suporte 👇", reply_markup=reply_markup)
+
     elif "android" in text or text.startswith("/android"):
-        await update.message.reply_text(f"📱 Android Download: {ANDROID_DOWNLOAD_URL}")
+        keyboard = [[InlineKeyboardButton("📱 Baixar Android", url=ANDROID_DOWNLOAD_URL)]]
+        reply_markup = InlineKeyboardMarkup(keyboard)
+        await update.message.reply_text("📱 Android Download:\nClique abaixo para baixar 👇", reply_markup=reply_markup)
+
     elif "ios" in text or text.startswith("/ios"):
-        await update.message.reply_text(f"🍏 iOS Download: {IOS_DOWNLOAD_URL}")
+        keyboard = [[InlineKeyboardButton("🍏 Baixar iOS", url=IOS_DOWNLOAD_URL)]]
+        reply_markup = InlineKeyboardMarkup(keyboard)
+        await update.message.reply_text("🍏 iOS Download:\nClique abaixo para baixar 👇", reply_markup=reply_markup)
+
     else:
         await update.message.reply_text("❓ Comando não reconhecido. Por favor, use os botões ou comandos disponíveis.")
+
 
 # 主程序
 if __name__ == "__main__":
