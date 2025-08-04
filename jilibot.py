@@ -1,3 +1,4 @@
+from autoreg_browser import auto_register
 from telegram import (
     Update,
     ReplyKeyboardMarkup,
