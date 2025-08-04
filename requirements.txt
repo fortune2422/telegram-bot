@@ -1,1 +1,2 @@
-python-telegram-bot>=20.5,<21.0
+--upgrade-strategy eager
+python-telegram-bot>=20.8,<21.0
