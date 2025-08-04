@@ -1,2 +1,1 @@
---upgrade-strategy eager
 python-telegram-bot>=20.8,<21.0
