@@ -1,15 +1,17 @@
-# 使用 Python 3.11 的轻量镜像
+# 使用 Python 3.11 镜像
 FROM python:3.11-slim
 
 # 设置工作目录
 WORKDIR /app
 
-# 复制项目所有文件
-COPY . /app
+# 复制代码和依赖
+COPY requirements.txt .
+RUN pip install --no-cache-dir -r requirements.txt
 
-# 安装依赖
-RUN pip install --upgrade pip
-RUN pip install -r requirements.txt
+COPY . .
+
+# 默认端口（Render 会通过 PORT 环境变量传递）
+ENV PORT=8443
 
 # 启动命令
 CMD ["python", "jilibot.py"]
