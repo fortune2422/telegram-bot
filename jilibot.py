@@ -3,7 +3,6 @@ from telegram import (
     Update,
     ReplyKeyboardMarkup,
     KeyboardButton,
-    CallbackQueryHandler, 
     InlineKeyboardButton,
     InlineKeyboardMarkup,
     BotCommand,
@@ -15,6 +14,7 @@ from telegram.ext import (
     CommandHandler,
     ContextTypes,
     MessageHandler,
+    CallbackQueryHandler, 
     filters,
 )
 
