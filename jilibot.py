@@ -15,6 +15,9 @@ from telegram.ext import (
     MessageHandler,
     filters,
 )
+# 顶部统一 import 区
+from playwright.async_api import async_playwright
+
 import telegram
 import os
 import random
@@ -36,12 +39,12 @@ CUSTOMER_SERVICE_URL = "https://magweb.meinuoka.com/Web/im.aspx?_=t&accountid=13
 IOS_DOWNLOAD_URL = "https://images.6929183.com/wsd-images-prod/jili707f2/merchant_resource/mobileconfig/jili707f2_2.4.3_20250725002905.mobileconfig"
 ANDROID_DOWNLOAD_URL = "https://images.847830.com/wsd-images-prod/jili707f2/merchant_resource/android/jili707f2_2.4.68_20250725002907.apk"
 
-# 自动注册功能
 def random_username():
     return "jili_" + ''.join(random.choices(string.digits, k=6))
 
 def random_password():
     return ''.join(random.choices(string.ascii_letters + string.digits, k=8))
+
 
 async def auto_register(update: Update, context: ContextTypes.DEFAULT_TYPE):
     username = random_username()
@@ -52,7 +55,6 @@ async def auto_register(update: Update, context: ContextTypes.DEFAULT_TYPE):
         "password": password,
         "confirm_password": password
     }
-
     try:
         async with aiohttp.ClientSession() as session:
             async with session.post(REGISTER_URL, data=form) as resp:
@@ -66,6 +68,39 @@ async def auto_register(update: Update, context: ContextTypes.DEFAULT_TYPE):
                     await update.message.reply_text("❌ Falha ao registrar. Tente manualmente em: https://jili707.co/register")
     except Exception as e:
         await update.message.reply_text("❌ Erro ao registrar. Tente novamente mais tarde.")
+
+
+async def auto_register_with_browser(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    username = random_username()
+    password = random_password()
+    
+    try:
+        async with async_playwright() as p:
+            browser = await p.chromium.launch(headless=True)
+            context_ = await browser.new_context()
+            page = await context_.new_page()
+
+            await page.goto(REGISTER_URL)
+            await page.fill('input[name="username"]', username)
+            await page.fill('input[name="password"]', password)
+            await page.fill('input[name="confirm_password"]', password)
+            await page.click('button[type="submit"]')  # 你也可以试试别的选择器，比如 .register-button
+
+            await page.wait_for_timeout(2000)  # 可根据网站响应速度调整
+
+            content = await page.content()
+            await browser.close()
+
+            if "login" in content.lower() or "success" in content.lower():
+                await update.message.reply_text(
+                    f"✅ Conta criada com sucesso!\n👤 Usuário: `{username}`\n🔐 Senha: `{password}`",
+                    parse_mode="Markdown"
+                )
+            else:
+                await update.message.reply_text("❌ Falha ao registrar. Tente manualmente em: https://jili707.co/register")
+
+    except Exception as e:
+        await update.message.reply_text(f"❌ Erro ao registrar com navegador: {str(e)}")
 
 # /start handler
 async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
@@ -176,6 +211,7 @@ if __name__ == "__main__":
     app.add_handler(CommandHandler("android", handle_text))
     app.add_handler(CommandHandler("ios", handle_text))
     app.add_handler(CommandHandler("autoreg", auto_register))
+    app.add_handler(CommandHandler("autoreg_browser", auto_register_with_browser))
 
     # 文本按钮 handler
     app.add_handler(MessageHandler(filters.TEXT & ~filters.COMMAND, handle_text))
