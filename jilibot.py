@@ -35,6 +35,13 @@ ANDROID_DOWNLOAD_URL = "https://images.847830.com/wsd-images-prod/jili707f2/merc
 
 # /start handler
 async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
+# ✅ 第1条消息：只发 WebApp 按钮（用于触发 OPEN）
+    await update.message.reply_text(
+        "🎮 Clique abaixo para entrar no jogo 👇",
+        reply_markup=InlineKeyboardMarkup([
+            [InlineKeyboardButton("🎮 Entrar no jogo", web_app=WebAppInfo(url=OFFICIAL_URL))]
+        ])
+    )
     # 💬 聊天框中绿色按钮
     inline_keyboard = [
         [InlineKeyboardButton("🎮 Entrar no jogo", web_app=WebAppInfo(url="https://www.jili707.co"))],
