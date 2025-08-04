@@ -1,4 +1,4 @@
-from autoreg_browser import auto_register
+from autoreg_browser import playwright_register
 from telegram import (
     Update,
     ReplyKeyboardMarkup,
@@ -46,28 +46,18 @@ def random_password():
 
 
 async def auto_register(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    username = random_username()
-    password = random_password()
+    await update.message.reply_text("⏳ Criando conta, por favor aguarde...")
 
-    form = {
-        "username": username,
-        "password": password,
-        "confirm_password": password
-    }
-    try:
-        async with aiohttp.ClientSession() as session:
-            async with session.post(REGISTER_URL, data=form) as resp:
-                text = await resp.text()
-                if "login" in text.lower() or "success" in text.lower():
-                    await update.message.reply_text(
-                        f"✅ Conta criada com sucesso!\n👤 Usuário: `{username}`\n🔐 Senha: `{password}`",
-                        parse_mode="Markdown"
-                    )
-                else:
-                    await update.message.reply_text("❌ Falha ao registrar. Tente manualmente em: https://jili707.co/register")
-    except Exception as e:
-        await update.message.reply_text("❌ Erro ao registrar. Tente novamente mais tarde.")
+    success, username, password = await playwright_register()
 
+    if success:
+        await update.message.reply_text(
+            f"✅ Conta criada com sucesso!\n👤 Usuário: `{username}`\n🔐 Senha: `{password}`",
+            parse_mode="Markdown"
+        )
+    else:
+        await update.message.reply_text("❌ Falha ao registrar. Tente novamente mais tarde ou use o site manualmente:\nhttps://jili707.co/register")
+        
 # /start handler
 async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
     await update.message.reply_text(
