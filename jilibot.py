@@ -69,12 +69,6 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
     # 发送绿色 inline 按钮
     await update.message.reply_text("⬇️ Acesso rápido abaixo:", reply_markup=inline_markup)
-    
-    # ✅✅✅ 新增部分：自动发送“OPEN”按钮（无文字）
-    open_button = [[InlineKeyboardButton("OPEN", web_app=WebAppInfo(url=OFFICIAL_URL))]]
-    open_markup = InlineKeyboardMarkup(open_button)
-    await update.message.reply_text("Clique no botão abaixo para abrir o jogo 👉", reply_markup=open_markup)  # 空格用于撑起按钮
-    # ✅✅✅ 新增部分结束
 
 # 菜单命令
 async def set_bot_commands(application):
