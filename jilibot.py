@@ -88,6 +88,8 @@ async def auto_register_with_browser(update: Update, context: ContextTypes.DEFAU
 
             await page.wait_for_timeout(2000)  # 可根据网站响应速度调整
 
+            await page.screenshot(path="register_result.png")
+
             content = await page.content()
             await browser.close()
 
