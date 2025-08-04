@@ -1,8 +1,9 @@
+import os
+import telegram
 from telegram import Update, InlineKeyboardButton, InlineKeyboardMarkup, BotCommand
 from telegram.ext import ApplicationBuilder, CommandHandler, ContextTypes
-import telegram
+
 print("🔍 当前 python-telegram-bot 版本:", telegram.__version__)
-import os
 
 TOKEN = "8331605813:AAFHs5vaFopD72LZOD-c1YsD4Ug2E47mbwg"
 
@@ -13,7 +14,7 @@ CUSTOMER_SERVICE_URL = "https://magweb.meinuoka.com/Web/im.aspx?_=t&accountid=13
 IOS_DOWNLOAD_URL = "https://images.6929183.com/wsd-images-prod/jili707f2/merchant_resource/mobileconfig/jili707f2_2.4.3_20250725002905.mobileconfig"
 ANDROID_DOWNLOAD_URL = "https://images.847830.com/wsd-images-prod/jili707f2/merchant_resource/android/jili707f2_2.4.68_20250725002907.apk"
 
-# /start 指令
+# /start 指令响应
 async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
     keyboard = [
         [
@@ -48,13 +49,9 @@ async def set_bot_commands(application):
         BotCommand("ios", "🍏 iOS")
     ]
     await application.bot.set_my_commands(commands)
-
-# 启动时运行的初始化函数
-async def on_startup(application):
-    await set_bot_commands(application)
     print("✅ 菜单命令已设置")
 
-# 其他指令
+# 其他指令处理函数
 async def register(update: Update, context: ContextTypes.DEFAULT_TYPE):
     await update.message.reply_text(f"🔗 {REGISTER_URL}")
 
@@ -70,9 +67,11 @@ async def android(update: Update, context: ContextTypes.DEFAULT_TYPE):
 async def ios(update: Update, context: ContextTypes.DEFAULT_TYPE):
     await update.message.reply_text(f"🍏 {IOS_DOWNLOAD_URL}")
 
-if __name__ == "__main__":
+# 主函数入口（async）
+async def main():
     app = ApplicationBuilder().token(TOKEN).build()
 
+    # 注册指令处理
     app.add_handler(CommandHandler("start", start))
     app.add_handler(CommandHandler("register", register))
     app.add_handler(CommandHandler("site", site))
@@ -80,4 +79,14 @@ if __name__ == "__main__":
     app.add_handler(CommandHandler("android", android))
     app.add_handler(CommandHandler("ios", ios))
 
-    app.run_polling(on_startup=on_startup)
+    # 设置菜单命令
+    await set_bot_commands(app)
+
+    # 启动轮询
+    print("🚀 Bot is starting...")
+    await app.run_polling()
+
+# 运行主函数
+if __name__ == "__main__":
+    import asyncio
+    asyncio.run(main())
