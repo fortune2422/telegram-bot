@@ -65,8 +65,11 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
 )
     inline_keyboard = [
         [InlineKeyboardButton("🎮 Entrar no jogo", web_app=WebAppInfo(url="https://www.jili707.co"))],
-        [InlineKeyboardButton("🟢 Link do site oficial", url=OFFICIAL_URL),
-         InlineKeyboardButton("🎮 Registre uma conta", url=REGISTER_URL)
+        [InlineKeyboardButton("🟢 Link do site oficial", url=OFFICIAL_URL)
+        ],
+        [ 
+         InlineKeyboardButton("🎮 Registre uma conta", url=REGISTER_URL),
+        InlineKeyboardButton("🧾 Criar conta automaticamente", callback_data="autoreg")
         ],
         [
             InlineKeyboardButton("🍏 iOS Download", url=IOS_DOWNLOAD_URL),
@@ -80,7 +83,8 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
     # ⌨️ 底部菜单按钮
     reply_keyboard = [
-        [KeyboardButton("🎮 Registre uma conta"), KeyboardButton("🟢 Link do site oficial")],
+        [KeyboardButton("🎮 Registre uma conta"), KeyboardButton("🧾 Criar conta automaticamente")],
+        [KeyboardButton("🟢 Link do site oficial")],
         [KeyboardButton("📱 ANDROID DOWNLOAD"), KeyboardButton("🍏 IOS DOWNLOAD")],
         [KeyboardButton("🧑‍💼 atendimento ao Cliente")],
     ]
@@ -109,12 +113,28 @@ async def set_bot_commands(application):
     ]
     await application.bot.set_my_commands(commands)
     print("✅ 菜单命令已设置")
+    
+# 📦 处理按钮点击（如“🧾 Criar conta automaticamente”）
+async def callback_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    query = update.callback_query
+    await query.answer()
 
+    if query.data == "autoreg":
+        await query.edit_message_text("⏳ Criando conta, por favor aguarde...")
+        success, username, password = await playwright_register()
+        if success:
+            await query.edit_message_text(
+                f"✅ Conta criada com sucesso!\n👤 Usuário: `{username}`\n🔐 Senha: `{password}`",
+                parse_mode="Markdown"
+            )
+        else:
+            await query.edit_message_text("❌ Falha ao registrar. Tente novamente mais tarde ou use o site:\nhttps://jili707.co/register")
+            
 ## 文本按钮命令
 async def handle_text(update: Update, context: ContextTypes.DEFAULT_TYPE):
     text = update.message.text.strip().lower()
 
-    if any(kw in text for kw in ["register", "registar", "account", "注册", "conta", "criar conta"]):
+    if any(kw in text for kw in ["criar conta automaticamente", "register", "registar", "account", "注册", "conta", "criar conta"]):
         await auto_register(update, context)  # ✅ 用 Playwright 方式（即 autoreg_browser.py 中的实现）
 
     elif "site" in text or text.startswith("/site"):
@@ -170,6 +190,8 @@ if __name__ == "__main__":
     app.add_handler(CommandHandler("android", handle_text))
     app.add_handler(CommandHandler("ios", handle_text))
     app.add_handler(CommandHandler("autoreg", auto_register))
+    app.add_handler(CallbackQueryHandler(callback_handler))
+
 
     # 文本按钮 handler
     app.add_handler(MessageHandler(filters.TEXT & ~filters.COMMAND, handle_text))
