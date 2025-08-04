@@ -1,6 +1,11 @@
 services:
   - type: web
     name: telegram-bot
-    env: docker
-    plan: free
-buildCommand: ./build.sh
+    env: python
+    buildCommand: |
+      pip install -r requirements.txt
+      python -m playwright install --with-deps
+    startCommand: python jilibot.py
+    envVars:
+      - key: PYTHON_VERSION
+        value: 3.11
