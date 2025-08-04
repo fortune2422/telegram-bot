@@ -122,6 +122,7 @@ async def post_init(application):
     try:
         # 设置聊天菜单为 WebApp 按钮
         await application.bot.set_chat_menu_button(
+            chat_id=None,  # 💡 关键点：设置全局默认按钮
             menu_button=MenuButtonWebApp(
                 text="OPEN",
                 web_app=WebAppInfo(url=OFFICIAL_URL)  # 指向你的网站即可
