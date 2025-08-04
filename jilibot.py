@@ -37,7 +37,7 @@ ANDROID_DOWNLOAD_URL = "https://images.847830.com/wsd-images-prod/jili707f2/merc
 async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
     # 💬 聊天框中绿色按钮
     inline_keyboard = [
-        [InlineKeyboardButton("🎮 Entrar no jogo", web_app=WebAppInfo(url=OFFICIAL_URL))],
+        [InlineKeyboardButton("🎮 Entrar no jogo", web_app=WebAppInfo(url="https://www.jili707.co"))],
         [InlineKeyboardButton("🟢 Link do site oficial", url=OFFICIAL_URL),
          InlineKeyboardButton("🎮 Registre uma conta", url=REGISTER_URL)
         ],
