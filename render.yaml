@@ -5,3 +5,4 @@ services:
     buildCommand: ""
     startCommand: python bot.py
     autoDeploy: true
+    python-telegram-bot>=20.3
