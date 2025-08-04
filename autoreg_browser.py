@@ -29,7 +29,9 @@ async def playwright_register():
             await page.fill('input[name="checkPass"]', password)
 
             # 提交注册（建议用按钮类型选择器更稳）
-            await page.click("button[type='submit']")
+            await page.wait_for_selector("button.submit_btn", timeout=5000)
+            await page.click("button.submit_btn")
+
 
             # 等待页面响应（可视情况改为 wait_for_selector）
             await page.wait_for_timeout(2000)
