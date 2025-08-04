@@ -1,3 +1,5 @@
+import telegram
+print("🔍 当前 python-telegram-bot 版本:", telegram.__version__)
 from telegram import Update, InlineKeyboardButton, InlineKeyboardMarkup, BotCommand
 from telegram.ext import ApplicationBuilder, CommandHandler, ContextTypes
 import os
