@@ -16,8 +16,6 @@ from telegram.ext import (
     MessageHandler,
     filters,
 )
-# 顶部统一 import 区
-from playwright.async_api import async_playwright
 
 import telegram
 import os
@@ -70,45 +68,11 @@ async def auto_register(update: Update, context: ContextTypes.DEFAULT_TYPE):
     except Exception as e:
         await update.message.reply_text("❌ Erro ao registrar. Tente novamente mais tarde.")
 
-
-async def auto_register_with_browser(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    username = random_username()
-    password = random_password()
-    
-    try:
-        async with async_playwright() as p:
-            browser = await p.chromium.launch(headless=True)
-            context_ = await browser.new_context()
-            page = await context_.new_page()
-
-            await page.goto(REGISTER_URL)
-            await page.fill('input[name="username"]', username)
-            await page.fill('input[name="password"]', password)
-            await page.fill('input[name="confirm_password"]', password)
-            await page.click('button[type="submit"]')  # 你也可以试试别的选择器，比如 .register-button
-
-            await page.wait_for_timeout(2000)  # 可根据网站响应速度调整
-
-            # 📸 截图页面
-            screenshot_path = "/tmp/register_page.png"
-            await page.screenshot(path=screenshot_path, full_page=True)
-
-            content = await page.content()
-            await browser.close()
-
-            if "login" in content.lower() or "success" in content.lower():
-                await update.message.reply_text(
-                    f"✅ Conta criada com sucesso!\n👤 Usuário: `{username}`\n🔐 Senha: `{password}`",
-                    parse_mode="Markdown"
-                )
-            else:
-                await update.message.reply_text("❌ Falha ao registrar. Tente manualmente em: https://jili707.co/register")
-
-    except Exception as e:
-        await update.message.reply_text(f"❌ Erro ao registrar com navegador: {str(e)}")
-
 # /start handler
 async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    await update.message.reply_text(
+    "Digite 'registrar' ou clique no botão abaixo para criar uma conta automaticamente."
+)
     inline_keyboard = [
         [InlineKeyboardButton("🎮 Entrar no jogo", web_app=WebAppInfo(url="https://www.jili707.co"))],
         [InlineKeyboardButton("🟢 Link do site oficial", url=OFFICIAL_URL),
@@ -161,7 +125,7 @@ async def handle_text(update: Update, context: ContextTypes.DEFAULT_TYPE):
     text = update.message.text.strip().lower()
 
     if any(kw in text for kw in ["register", "registar", "account", "注册", "conta", "criar conta"]):
-        await auto_register(update, context)
+        await auto_register(update, context)  # ✅ 用 Playwright 方式（即 autoreg_browser.py 中的实现）
 
     elif "site" in text or text.startswith("/site"):
         keyboard = [[InlineKeyboardButton("🟢 Acessar site oficial", url=OFFICIAL_URL)]]
@@ -216,7 +180,6 @@ if __name__ == "__main__":
     app.add_handler(CommandHandler("android", handle_text))
     app.add_handler(CommandHandler("ios", handle_text))
     app.add_handler(CommandHandler("autoreg", auto_register))
-    app.add_handler(CommandHandler("autoreg_browser", auto_register_with_browser))
 
     # 文本按钮 handler
     app.add_handler(MessageHandler(filters.TEXT & ~filters.COMMAND, handle_text))
