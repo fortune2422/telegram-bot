@@ -6,6 +6,7 @@ from telegram import (
     InlineKeyboardMarkup,
     BotCommand,
     WebAppInfo,
+    MenuButtonWebApp,
 )
 from telegram.ext import (
     ApplicationBuilder,
@@ -113,6 +114,22 @@ async def handle_text(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
     else:
         await update.message.reply_text("❓ Comando não reconhecido. Por favor, use os botões ou comandos disponíveis.")
+        
+# 初始化时设置菜单命令和聊天菜单按钮
+async def post_init(application):
+    await set_bot_commands(application)
+
+    try:
+        # 设置聊天菜单为 WebApp 按钮
+        await application.bot.set_chat_menu_button(
+            menu_button=MenuButtonWebApp(
+                text="OPEN",
+                web_app=WebAppInfo(url=OFFICIAL_URL)  # 指向你的网站即可
+            )
+        )
+        print("✅ OPEN 按钮已设置")
+    except Exception as e:
+        print(f"❌ 设置 OPEN 按钮失败: {e}")
 
 
 # 主程序
@@ -131,7 +148,7 @@ if __name__ == "__main__":
     app.add_handler(MessageHandler(filters.TEXT & ~filters.COMMAND, handle_text))
 
     # 设置菜单命令
-    app.post_init = set_bot_commands
+    app.post_init = post_init
 
     # 启动 webhook（Render 部署）
     app.run_webhook(
