@@ -147,6 +147,10 @@ if __name__ == "__main__":
 
     # 文本按钮 handler
     app.add_handler(MessageHandler(filters.TEXT & ~filters.COMMAND, handle_text))
+    
+async def post_init(application):
+    print("⚙️ 正在设置 Bot 菜单按钮...")  # 临时调试输出
+    ...
 
     # 设置菜单命令
     app.post_init = post_init
