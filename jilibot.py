@@ -1,10 +1,10 @@
-import os
-import telegram
 from telegram import Update, InlineKeyboardButton, InlineKeyboardMarkup, BotCommand
 from telegram.ext import ApplicationBuilder, CommandHandler, ContextTypes
+import telegram
 
 print("🔍 当前 python-telegram-bot 版本:", telegram.__version__)
 
+# 你的 Bot Token
 TOKEN = "8331605813:AAFHs5vaFopD72LZOD-c1YsD4Ug2E47mbwg"
 
 # URLs
@@ -14,7 +14,7 @@ CUSTOMER_SERVICE_URL = "https://magweb.meinuoka.com/Web/im.aspx?_=t&accountid=13
 IOS_DOWNLOAD_URL = "https://images.6929183.com/wsd-images-prod/jili707f2/merchant_resource/mobileconfig/jili707f2_2.4.3_20250725002905.mobileconfig"
 ANDROID_DOWNLOAD_URL = "https://images.847830.com/wsd-images-prod/jili707f2/merchant_resource/android/jili707f2_2.4.68_20250725002907.apk"
 
-# /start 指令响应
+# /start 指令
 async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
     keyboard = [
         [
@@ -67,11 +67,11 @@ async def android(update: Update, context: ContextTypes.DEFAULT_TYPE):
 async def ios(update: Update, context: ContextTypes.DEFAULT_TYPE):
     await update.message.reply_text(f"🍏 {IOS_DOWNLOAD_URL}")
 
-# 主函数入口（async）
-async def main():
+# 主程序入口
+if __name__ == "__main__":
     app = ApplicationBuilder().token(TOKEN).build()
 
-    # 注册指令处理
+    # 添加命令处理器
     app.add_handler(CommandHandler("start", start))
     app.add_handler(CommandHandler("register", register))
     app.add_handler(CommandHandler("site", site))
@@ -79,14 +79,8 @@ async def main():
     app.add_handler(CommandHandler("android", android))
     app.add_handler(CommandHandler("ios", ios))
 
-    # 设置菜单命令
-    await set_bot_commands(app)
+    # 使用 post_init 来设置 bot 命令
+    app.post_init = set_bot_commands
 
-    # 启动轮询
-    print("🚀 Bot is starting...")
-    await app.run_polling()
-
-# 运行主函数
-if __name__ == "__main__":
-    import asyncio
-    asyncio.run(main())
+    # 启动 bot
+    app.run_polling()
