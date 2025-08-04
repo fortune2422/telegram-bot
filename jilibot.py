@@ -1,6 +1,12 @@
-from telegram import Update, InlineKeyboardButton, InlineKeyboardMarkup, BotCommand
+from telegram import (
+    Update,
+    ReplyKeyboardMarkup,
+    KeyboardButton,
+    BotCommand
+)
 from telegram.ext import ApplicationBuilder, CommandHandler, ContextTypes
 import telegram
+import os
 
 print("🔍 当前 python-telegram-bot 版本:", telegram.__version__)
 
@@ -18,18 +24,18 @@ ANDROID_DOWNLOAD_URL = "https://images.847830.com/wsd-images-prod/jili707f2/merc
 async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
     keyboard = [
         [
-            InlineKeyboardButton("🎮 Registre uma conta", url=REGISTER_URL),
-            InlineKeyboardButton("🟢 Link do site oficial", url=OFFICIAL_URL)
+            KeyboardButton("🎮 Registre uma conta", url=REGISTER_URL),
+            KeyboardButton("🟢 Link do site oficial", url=OFFICIAL_URL)
         ],
         [
-            InlineKeyboardButton("📱 ANDROID DOWNLOAD", url=ANDROID_DOWNLOAD_URL),
-            InlineKeyboardButton("📱🍏 IOS DOWNLOAD", url=IOS_DOWNLOAD_URL)
+            KeyboardButton("📱 ANDROID DOWNLOAD", url=ANDROID_DOWNLOAD_URL),
+            KeyboardButton("📱🍏 IOS DOWNLOAD", url=IOS_DOWNLOAD_URL)
         ],
         [
-            InlineKeyboardButton("🧑‍💼 atendimento ao Cliente", url=CUSTOMER_SERVICE_URL)
+            KeyboardButton("🧑‍💼 atendimento ao Cliente", url=CUSTOMER_SERVICE_URL)
         ]
     ]
-    reply_markup = InlineKeyboardMarkup(keyboard)
+    reply_markup = ReplyKeyboardMarkup(keyboard, resize_keyboard=True)
 
     text = (
         "Bem-vindo ao bot oficial do jili707.co, um produto de apostas baseado na plataforma jili707.\n"
