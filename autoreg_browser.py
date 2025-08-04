@@ -11,7 +11,7 @@ def generate_random_account():
     return username, password
 
 # 注册主函数
-async def auto_register():
+async def auto_register(update: Update, context: ContextTypes.DEFAULT_TYPE):
     username, password = generate_random_account()
 
     try:
