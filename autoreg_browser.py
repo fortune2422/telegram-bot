@@ -10,8 +10,8 @@ def generate_random_account():
     password = ''.join(random.choices(string.ascii_letters + string.digits, k=10))
     return username, password
 
-# 注册主函数
-async def auto_register(update: Update, context: ContextTypes.DEFAULT_TYPE):
+# Playwright 注册函数，不再接收 update/context，只负责返回结果
+async def playwright_register():
     username, password = generate_random_account()
 
     try:
