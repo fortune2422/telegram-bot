@@ -61,7 +61,7 @@ async def auto_register(update: Update, context: ContextTypes.DEFAULT_TYPE):
 # /start handler
 async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
     await update.message.reply_text(
-    "Digite 'registrar' ou clique no botão abaixo para criar uma conta automaticamente."
+    "Digite 'register' ou clique no botão abaixo para criar uma conta automaticamente."
 )
     inline_keyboard = [
         [InlineKeyboardButton("🎮 Entrar no jogo", web_app=WebAppInfo(url="https://www.jili707.co"))],
