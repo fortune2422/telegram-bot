@@ -84,7 +84,7 @@ async def set_bot_commands(application):
 async def handle_text(update: Update, context: ContextTypes.DEFAULT_TYPE):
     text = update.message.text.strip().lower()
 
-if "registre" in text or text.startswith("/register"):
+    if "registre" in text or text.startswith("/register"):
         await update.message.reply_text(f"🎮 Registre uma conta: {REGISTER_URL}")
     elif "site" in text or text.startswith("/site"):
         await update.message.reply_text(f"🟢 Link do site oficial: {OFFICIAL_URL}")
