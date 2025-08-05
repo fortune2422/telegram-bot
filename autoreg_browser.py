@@ -56,30 +56,30 @@ async def playwright_check_info(username: str, password: str):
         context = await browser.new_context()
         page = await context.new_page()
 
-        await page.goto("https://jili707.co/login")
-
-        await page.fill('input[name="username"]', username)
-        await page.fill('input[name="password"]', password)
-        await page.click('button[type="submit"]')
-
         try:
-            await page.wait_for_selector("span.balance", timeout=5000)
-            balance = await page.text_content("span.balance")
-        except:
-            balance = "N/A"
+            await page.goto("https://jili707.co/login")
 
-        try:
-            await page.wait_for_selector("input#address", timeout=3000)
-            invite_url = await page.get_attribute("input#address", "value")
-        except:
-            invite_url = "N/A"
+            await page.fill('input[name="username"]', username)
+            await page.fill('input[name="password"]', password)
+            await page.click('button[type="submit"]')
 
-        await browser.close()
+            try:
+                await page.wait_for_selector("span.balance", timeout=5000)
+                balance = await page.text_content("span.balance")
+            except:
+                balance = "N/A"
 
-        return {
-            "balance": (balance or "N/A").strip(),
-            "invite_url": (invite_url or "N/A").strip()
-        }
+            try:
+                await page.wait_for_selector("input#address", timeout=3000)
+                invite_url = await page.get_attribute("input#address", "value")
+            except:
+                invite_url = "N/A"
 
-    finally:
-        await browser.close()
+            return {
+                "balance": (balance or "N/A").strip(),
+                "invite_url": (invite_url or "N/A").strip()
+            }
+
+        finally:
+            await browser.close()
+
