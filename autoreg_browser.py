@@ -51,28 +51,42 @@ async def playwright_register():
         await browser.close()
 
 async def playwright_check_info(username: str, password: str):
-    async with async_playwright() as p:
-        browser = await p.chromium.launch(headless=True)
-        context = await browser.new_context()
-        page = await context.new_page()
+    browser = None  # 先声明变量，确保 finally 能关闭
 
-        try:
-            await page.goto("https://jili707.co/login")
+    try:
+        print(f"🔐 正在使用 {username}/{password} 登录查询余额...")
 
+        async with async_playwright() as p:
+            browser = await p.chromium.launch(headless=True)
+            context = await browser.new_context()
+            page = await context.new_page()
+
+            await page.goto("https://jili707.co/login", timeout=10000)
             await page.fill('input[name="username"]', username)
             await page.fill('input[name="password"]', password)
             await page.click('button[type="submit"]')
 
+            await page.wait_for_timeout(3000)  # 等待页面跳转加载
+
+            # 打印页面内容调试
+            print("🔍 登录后页面内容部分：")
+            content = await page.content()
+            print(content[:1000])  # 只打印前1000字符避免日志过长
+
+            # 查询余额
             try:
                 await page.wait_for_selector("span.balance", timeout=5000)
                 balance = await page.text_content("span.balance")
             except:
+                print("❌ 未找到 balance 元素")
                 balance = "N/A"
 
+            # 查询邀请链接
             try:
-                await page.wait_for_selector("input#address", timeout=3000)
+                await page.wait_for_selector("input#address", timeout=5000)
                 invite_url = await page.get_attribute("input#address", "value")
             except:
+                print("❌ 未找到 invite_url 元素")
                 invite_url = "N/A"
 
             return {
@@ -80,6 +94,10 @@ async def playwright_check_info(username: str, password: str):
                 "invite_url": (invite_url or "N/A").strip()
             }
 
-        finally:
-            await browser.close()
+    except Exception as e:
+        print("❌ playwright_check_info 报错:", e)
+        return None
 
+    finally:
+        if browser:
+            await browser.close()
