@@ -1,7 +1,6 @@
 # autoreg_browser.py
 import random, string, asyncio
 from playwright.async_api import async_playwright
-from playwright.sync_api import sync_playwright
 
 REGISTER_URL = "https://jili707.co/register"
 
@@ -51,38 +50,36 @@ async def playwright_register():
     finally:
         await browser.close()
 
-def playwright_check_info(username: str, password: str):
-    with sync_playwright() as p:
-        browser = p.chromium.launch(headless=True)
+async def playwright_check_info(username: str, password: str):
+    async with async_playwright() as p:
+        browser = await p.chromium.launch(headless=True)
+        context = await browser.new_context()
+        page = await context.new_page()
+
+        await page.goto("https://jili707.co/login")
+
+        await page.fill('input[name="username"]', username)
+        await page.fill('input[name="password"]', password)
+        await page.click('button[type="submit"]')
+
         try:
-            page = browser.new_page()
+            await page.wait_for_selector("span.balance", timeout=5000)
+            balance = await page.text_content("span.balance")
+        except:
+            balance = "N/A"
 
-            # 打开登录页面
-            page.goto("https://jili707.co/login")
+        try:
+            await page.wait_for_selector("input#address", timeout=3000)
+            invite_url = await page.get_attribute("input#address", "value")
+        except:
+            invite_url = "N/A"
 
-            # 输入用户名与密码
-            page.fill('input[name="username"]', username)
-            page.fill('input[name="password"]', password)
+        await browser.close()
 
-            # 点击登录按钮
-            page.click('button[type="submit"]')
-
-            # 等待登录后余额元素出现
-            page.wait_for_selector("span.balance", timeout=5000)
-
-            # 获取余额
-            balance = page.text_content("span.balance") or "N/A"
-
-            # 获取邀请码链接
-            try:
-                invite_url = page.get_attribute("input#address", "value") or "N/A"
-            except:
-                invite_url = "N/A"
-
-            return {
-                "balance": balance.strip(),
-                "invite_url": invite_url.strip()
-            }
+        return {
+            "balance": (balance or "N/A").strip(),
+            "invite_url": (invite_url or "N/A").strip()
+        }
 
         finally:
             browser.close()
