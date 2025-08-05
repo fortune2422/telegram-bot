@@ -139,7 +139,7 @@ async def callback_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
         user_id = query.from_user.id
         if success:
             save_account(user_id, username, password)         
-        await query.edit_message_text(
+            await query.edit_message_text(
                 f"✅ Conta criada com sucesso!\n👤 Usuário: `{username}`\n🔐 Senha: `{password}`",
                 parse_mode="Markdown"
             )
