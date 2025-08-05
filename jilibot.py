@@ -1,4 +1,6 @@
 from autoreg_browser import playwright_check_info, playwright_register
+from account_storage import save_account, is_registered
+from account_storage import load_account 
 from telegram import (
     Update,
     ReplyKeyboardMarkup,
@@ -48,21 +50,27 @@ def random_username():
 
 def random_password():
     return ''.join(random.choices(string.ascii_letters + string.digits, k=8))
-
-
+    
 async def auto_register(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    user_id = update.effective_user.id
+
+    if is_registered(user_id):
+        await update.message.reply_text("✅ Você já criou uma conta. Não é possível registrar novamente.")
+        return
+
     await update.message.reply_text("⏳ Criando conta, por favor aguarde...")
 
     success, username, password = await playwright_register()
 
     if success:
+        save_account(user_id, username, password)
         await update.message.reply_text(
             f"✅ Conta criada com sucesso!\n👤 Usuário: `{username}`\n🔐 Senha: `{password}`",
             parse_mode="Markdown"
         )
     else:
         await update.message.reply_text("❌ Falha ao registrar. Tente novamente mais tarde ou use o site manualmente:\nhttps://jili707.co/register")
-        
+
 # /start handler
 async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
     await update.message.reply_text(
@@ -207,14 +215,15 @@ async def post_init(application):
     
 async def balance_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
     user_id = update.effective_user.id
-    if user_id not in user_accounts:
+
+    # ✅ 使用 JSON 文件判断是否已注册
+    if not is_registered(user_id):
         await update.message.reply_text("❌ Você ainda não criou uma conta. Por favor, registre-se primeiro.")
         return
 
-    username = user_accounts[user_id]["username"]
-    password = user_accounts[user_id]["password"]
+    # ✅ 从 JSON 读取账号信息
+    username, password = load_account(user_id)
 
-    # 查询信息
     info = await playwright_check_info(username, password)
     if info is None:
         await update.message.reply_text("⚠️ Falha ao consultar informações. Tente novamente mais tarde.")
@@ -224,6 +233,7 @@ async def balance_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
         f"💰 Saldo atual: `{info['balance']}`\n🔗 Link de convite: {info['invite_url']}",
         parse_mode="Markdown"
     )
+
     
 # 主程序
 if __name__ == "__main__":
