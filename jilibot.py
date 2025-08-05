@@ -85,9 +85,8 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
     # ⌨️ 底部菜单按钮
     reply_keyboard = [
         [KeyboardButton("🎮 Registre uma conta"), KeyboardButton("🧾 Criar conta automaticamente")],
-        [KeyboardButton("🟢 Link do site oficial")],
+        [KeyboardButton("🟢 Link do site oficial"),KeyboardButton("🧑‍💼 atendimento ao Cliente")],
         [KeyboardButton("📱 ANDROID DOWNLOAD"), KeyboardButton("🍏 IOS DOWNLOAD")],
-        [KeyboardButton("🧑‍💼 atendimento ao Cliente")],
     ]
     reply_markup = ReplyKeyboardMarkup(reply_keyboard, resize_keyboard=True)
 
