@@ -23,6 +23,7 @@ import os
 import random
 import string
 import aiohttp
+import asyncio
 
 print("🔍 当前 python-telegram-bot 版本:", telegram.__version__)
 
@@ -159,7 +160,16 @@ async def handle_text(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
     else:
         await update.message.reply_text("❓ Comando não reconhecido. Por favor, use os botões ou comandos disponíveis.")
-        
+
+async def keep_alive():
+    while True:
+        try:
+            async with aiohttp.ClientSession() as session:
+                await session.get("https://telegram-bot-45rt.onrender.com")
+        except Exception as e:
+            print(f"Keep-alive error: {e}")
+        await asyncio.sleep(600)  # 每 10 分钟 ping 一次
+
 # 👇 定义 post_init 函数（执行初始化动作，比如设置菜单命令和 OPEN 按钮）
 async def post_init(application):
     print("⚙️ 正在设置 Bot 菜单按钮...")  # 调试用，部署时可删
@@ -176,7 +186,8 @@ async def post_init(application):
         )
     )
     print("✅ OPEN 按钮已设置")  # 可选调试日志
-
+ # ✅ 启动 keep-alive 任务（定时 ping Render，避免挂起）
+    asyncio.create_task(keep_alive())
 
 # 主程序
 if __name__ == "__main__":
