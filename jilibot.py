@@ -220,17 +220,18 @@ async def balance_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
     # ✅ 从 JSON 读取账号信息
     username, password = load_account(user_id)
 
-try:
-    info = await playwright_check_info(username, password)
+    try:
+        info = await playwright_check_info(username, password)
 
-    await update.message.reply_text(
-        f"💰 Saldo atual: `{info['balance']}`\n🔗 Link de convite: {info['invite_url']}",
-        parse_mode="Markdown"
-    )
+        await update.message.reply_text(
+            f"💰 Saldo atual: `{info['balance']}`\n🔗 Link de convite: {info['invite_url']}",
+            parse_mode="Markdown"
+        )
 
-except Exception as e:
-    print("❌ playwright_check_info 执行失败:", e)
-    await update.message.reply_text("⚠️ Falha ao consultar informações. Tente novamente mais tarde.")
+    except Exception as e:
+        print("❌ playwright_check_info 执行失败:", e)
+        await update.message.reply_text("⚠️ Falha ao consultar informações. Tente novamente mais tarde.")
+
 
 # 主程序
 if __name__ == "__main__":
