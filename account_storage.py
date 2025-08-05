@@ -1,34 +1,30 @@
 import json
 import os
-from datetime import datetime
 
-ACCOUNT_FILE = "accounts.json"
+DATA_FILE = "accounts.json"
 
-# 初始化文件
-if not os.path.exists(ACCOUNT_FILE):
-    with open(ACCOUNT_FILE, "w") as f:
-        json.dump({}, f)
+def load_data():
+    if not os.path.exists(DATA_FILE):
+        return {}
+    with open(DATA_FILE, "r") as f:
+        return json.load(f)
 
-# 保存账号信息
+def save_data(data):
+    with open(DATA_FILE, "w") as f:
+        json.dump(data, f)
+
+def is_registered(user_id: int) -> bool:
+    data = load_data()
+    return str(user_id) in data
+
 def save_account(user_id: int, username: str, password: str):
-    with open(ACCOUNT_FILE, "r") as f:
-        data = json.load(f)
+    data = load_data()
+    data[str(user_id)] = {"username": username, "password": password}
+    save_data(data)
 
-    data[str(user_id)] = {
-        "username": username,
-        "password": password,
-        "created_at": datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-    }
-
-    with open(ACCOUNT_FILE, "w") as f:
-        json.dump(data, f, indent=2)
-
-# 查询账号信息
-def get_account(user_id: int):
-    with open(ACCOUNT_FILE, "r") as f:
-        data = json.load(f)
-    return data.get(str(user_id))
-
-# 检查是否已注册
-def is_registered(user_id: int):
-    return get_account(user_id) is not None
+def load_account(user_id: int):
+    data = load_data()
+    acc = data.get(str(user_id))
+    if acc:
+        return acc["username"], acc["password"]
+    return None, None
