@@ -61,7 +61,12 @@ async def playwright_check_info(username: str, password: str):
             context = await browser.new_context()
             page = await context.new_page()
 
-            await page.goto("https://jili707.co/login", timeout=10000)
+            await page.goto("https://jili707.co/login", timeout=30000)
+
+            # 等待页面的输入框加载完成再操作
+            await page.wait_for_selector('input[name="username"]', timeout=10000)
+            await page.wait_for_selector('input[name="password"]', timeout=10000)
+
             await page.fill('input[name="username"]', username)
             await page.fill('input[name="password"]', password)
             await page.click('button[type="submit"]')
