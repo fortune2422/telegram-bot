@@ -136,14 +136,11 @@ async def callback_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
     if query.data == "autoreg":
         await query.edit_message_text("⏳ Criando conta, por favor aguarde...")
         success, username, password = await playwright_register()
-            # 缓存账号信息
-        user_id = update.effective_user.id
-        user_accounts[user_id] = {"username": username, "password": password}
-            # 缓存账号信息
         user_id = query.from_user.id
-        user_accounts[user_id] = {"username": username, "password": password}
-
+       
         if success:
+             save_account(user_id, username, password)
+            
             await query.edit_message_text(
                 f"✅ Conta criada com sucesso!\n👤 Usuário: `{username}`\n🔐 Senha: `{password}`",
                 parse_mode="Markdown"
