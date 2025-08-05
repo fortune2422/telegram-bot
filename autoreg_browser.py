@@ -81,6 +81,5 @@ async def playwright_check_info(username: str, password: str):
             "invite_url": (invite_url or "N/A").strip()
         }
 
-        finally:
-            browser.close()
-
+    finally:
+        await browser.close()
