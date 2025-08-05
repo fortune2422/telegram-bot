@@ -51,7 +51,7 @@ async def playwright_register():
         await browser.close()
 
 async def playwright_check_info(username: str, password: str):
-    browser = None  # 先声明变量，确保 finally 能关闭
+    browser = None
 
     try:
         print(f"🔐 正在使用 {username}/{password} 登录查询余额...")
@@ -68,10 +68,15 @@ async def playwright_check_info(username: str, password: str):
 
             await page.wait_for_timeout(3000)  # 等待页面跳转加载
 
+            # ✅ 登录是否成功
+            if "login" in page.url:
+                print("❌ 登录失败：仍然停留在登录页面")
+                return None
+
             # 打印页面内容调试
-            print("🔍 登录后页面内容部分：")
             content = await page.content()
-            print(content[:1000])  # 只打印前1000字符避免日志过长
+            print("🔍 登录后页面内容部分：")
+            print(content[:1000])  # 避免日志过长
 
             # 查询余额
             try:
@@ -101,3 +106,4 @@ async def playwright_check_info(username: str, password: str):
     finally:
         if browser:
             await browser.close()
+
