@@ -1,6 +1,7 @@
 # autoreg_browser.py
 import random, string, asyncio
 from playwright.async_api import async_playwright
+from playwright.sync_api import sync_playwright
 
 REGISTER_URL = "https://jili707.co/register"
 
@@ -49,3 +50,40 @@ async def playwright_register():
 
     finally:
         await browser.close()
+
+def playwright_check_info(username: str, password: str):
+    with sync_playwright() as p:
+        browser = p.chromium.launch(headless=True)
+        try:
+            page = browser.new_page()
+
+            # 打开登录页面
+            page.goto("https://jili707.co/login")
+
+            # 输入用户名与密码
+            page.fill('input[name="username"]', username)
+            page.fill('input[name="password"]', password)
+
+            # 点击登录按钮
+            page.click('button[type="submit"]')
+
+            # 等待登录后余额元素出现
+            page.wait_for_selector("span.balance", timeout=5000)
+
+            # 获取余额
+            balance = page.text_content("span.balance") or "N/A"
+
+            # 获取邀请码链接
+            try:
+                invite_url = page.get_attribute("input#address", "value") or "N/A"
+            except:
+                invite_url = "N/A"
+
+            return {
+                "balance": balance.strip(),
+                "invite_url": invite_url.strip()
+            }
+
+        finally:
+            browser.close()
+
