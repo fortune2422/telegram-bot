@@ -138,14 +138,15 @@ async def callback_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
         success, username, password = await playwright_register()
         user_id = query.from_user.id
         if success:
-            save_account(user_id, username, password)         
+            save_account(user_id, username, password)
             await query.edit_message_text(
                 f"✅ Conta criada com sucesso!\n👤 Usuário: `{username}`\n🔐 Senha: `{password}`",
                 parse_mode="Markdown"
             )
         else:
-            await query.edit_message_text("❌ Falha ao registrar. Tente novamente mais tarde ou use o site:\nhttps://jili707.co/register")
-            
+            await query.edit_message_text(
+                "❌ Falha ao registrar. Tente novamente mais tarde ou use o site:\nhttps://jili707.co/register"
+            )
 ## 文本按钮命令
 async def handle_text(update: Update, context: ContextTypes.DEFAULT_TYPE):
     text = update.message.text.strip().lower()
