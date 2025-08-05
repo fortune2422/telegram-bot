@@ -9,3 +9,10 @@ services:
     envVars:
       - key: PYTHON_VERSION
         value: 3.11
+    plan: free  # ✅ 指定为免费计划（也可以写 professional）
+    autoDeploy: true  # ✅ 自动部署 Git 提交（默认是 true，可明确写出）
+    routes:
+      - type: http
+        path: /  # ✅ Render 的首页，给 keep-alive 用
+      - type: http
+        path: /8331605813:AAFHs5vaFopD72LZOD-c1YsD4Ug2E47mbwg  # ✅ Telegram webhook 路径
