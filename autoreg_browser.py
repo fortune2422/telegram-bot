@@ -3,6 +3,7 @@ import random, string, asyncio
 from playwright.async_api import async_playwright
 
 REGISTER_URL = "https://jili707.co/register"
+LOGIN_URL = "https://jili707.co/login"
 
 # 生成随机账号
 def generate_random_account():
@@ -13,7 +14,8 @@ def generate_random_account():
 # Playwright 注册函数，不再接收 update/context，只负责返回结果
 async def playwright_register():
     username, password = generate_random_account()
-
+    browser = None
+    
     try:
         async with async_playwright() as p:
             browser = await p.chromium.launch(headless=True)
@@ -23,18 +25,23 @@ async def playwright_register():
             # 打开注册页面
             await page.goto(REGISTER_URL, timeout=20000)
 
+            # ✅ 等待所有表单元素加载完成
+            await page.wait_for_selector('input[name="username"]', timeout=10000)
+            await page.wait_for_selector('input[name="password"]', timeout=10000)
+            await page.wait_for_selector('input[name="checkPass"]', timeout=10000)
+            await page.wait_for_selector('button.submit_btn', timeout=10000)
+
             # 填写表单
             await page.fill('input[name="username"]', username)
             await page.fill('input[name="password"]', password)
             await page.fill('input[name="checkPass"]', password)
 
-            # 提交注册（建议用按钮类型选择器更稳）
-            await page.wait_for_selector("button.submit_btn", timeout=5000)
+            # 提交注册
             await page.click("button.submit_btn")
-
 
             # 等待页面响应（可视情况改为 wait_for_selector）
             await page.wait_for_timeout(2000)
+
 
             # 页面内容判断是否成功
             content = await page.content()
@@ -61,7 +68,7 @@ async def playwright_check_info(username: str, password: str):
             context = await browser.new_context()
             page = await context.new_page()
 
-            await page.goto("https://jili707.co/login", timeout=30000)
+            await page.goto(LOGIN_URL, timeout=30000)
 
             # 等待页面的输入框加载完成再操作
             await page.wait_for_selector('input[name="username"]', timeout=10000)
