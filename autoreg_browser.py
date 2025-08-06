@@ -11,40 +11,41 @@ def generate_random_account():
     password = ''.join(random.choices(string.ascii_letters + string.digits, k=10))
     return username, password
 
-# Playwright 注册函数，不再接收 update/context，只负责返回结果
 async def playwright_register():
     username, password = generate_random_account()
     browser = None
-    
+
     try:
         async with async_playwright() as p:
-            browser = await p.chromium.launch(headless=True)
-            context = await browser.new_context()
+            browser = await p.chromium.launch(headless=False, slow_mo=100)  # 开启可视模式调试
+            context = await browser.new_context(
+                user_agent="Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/115.0.0.0 Safari/537.36",
+                viewport={'width': 1280, 'height': 800}
+            )
             page = await context.new_page()
 
-            # 打开注册页面
             await page.goto(REGISTER_URL, timeout=20000)
+            await page.wait_for_selector('input[name="username"]')
 
-            # ✅ 等待所有表单元素加载完成
-            await page.wait_for_selector('input[name="username"]', timeout=10000)
-            await page.wait_for_selector('input[name="password"]', timeout=10000)
-            await page.wait_for_selector('input[name="checkPass"]', timeout=10000)
-            await page.wait_for_selector('button.submit_btn', timeout=10000)
+            # 模拟人工输入
+            await page.click('input[name="username"]')
+            await page.keyboard.type(username)
+            await asyncio.sleep(0.5)
 
-            # 填写表单
-            await page.fill('input[name="username"]', username)
-            await page.fill('input[name="password"]', password)
-            await page.fill('input[name="checkPass"]', password)
+            await page.click('input[name="password"]')
+            await page.keyboard.type(password)
+            await asyncio.sleep(0.5)
 
-            # 提交注册
+            await page.click('input[name="checkPass"]')
+            await page.keyboard.type(password)
+            await asyncio.sleep(0.5)
+
             await page.click("button.submit_btn")
+            await page.wait_for_timeout(3000)
 
-            # 等待页面响应（可视情况改为 wait_for_selector）
-            await page.wait_for_timeout(2000)
-
-
-            # 页面内容判断是否成功
             content = await page.content()
+            print(content[:800])  # 打印前 800 字，看看注册失败提示
+
             if "login" in content.lower() or "success" in content.lower() or "成功" in content:
                 return True, username, password
             else:
@@ -55,7 +56,8 @@ async def playwright_register():
         return False, None, None
 
     finally:
-        await browser.close()
+        if browser:
+            await browser.close()
 
 async def playwright_check_info(username: str, password: str):
     browser = None
