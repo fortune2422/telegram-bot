@@ -13,42 +13,43 @@ def generate_random_account():
 
 async def playwright_register():
     username, password = generate_random_account()
-    browser = None
 
     try:
         async with async_playwright() as p:
-            browser = await p.chromium.launch(headless=False, slow_mo=100)  # 开启可视模式调试
-            context = await browser.new_context(
-                user_agent="Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/115.0.0.0 Safari/537.36",
-                viewport={'width': 1280, 'height': 800}
-            )
+            browser = await p.chromium.launch(headless=True)
+            context = await browser.new_context()
             page = await context.new_page()
 
-            await page.goto(REGISTER_URL, timeout=20000)
-            await page.wait_for_selector('input[name="username"]')
+            await page.goto(REGISTER_URL, timeout=30000)
+            await page.wait_for_load_state("domcontentloaded")  # 等待 DOM 加载完成
+            print("📄 当前页面 URL:", page.url)
 
-            # 模拟人工输入
-            await page.click('input[name="username"]')
-            await page.keyboard.type(username)
-            await asyncio.sleep(0.5)
+            # 填写表单字段
+            try:
+                await page.wait_for_selector('input[name="username"]', timeout=15000)
+                await page.fill('input[name="username"]', username)
+            except Exception as e:
+                print("❌ 找不到 username 输入框:", e)
+                return False, None, None
 
-            await page.click('input[name="password"]')
-            await page.keyboard.type(password)
-            await asyncio.sleep(0.5)
+            await page.fill('input[name="password"]', password)
+            await page.fill('input[name="checkPass"]', password)
 
-            await page.click('input[name="checkPass"]')
-            await page.keyboard.type(password)
-            await asyncio.sleep(0.5)
+            # 提交按钮
+            try:
+                await page.wait_for_selector("button.submit_btn", timeout=10000)
+                await page.click("button.submit_btn")
+            except Exception as e:
+                print("❌ 找不到提交按钮:", e)
+                return False, None, None
 
-            await page.click("button.submit_btn")
+            # 等待注册成功跳转或响应
             await page.wait_for_timeout(3000)
-
             content = await page.content()
-            print(content[:800])  # 打印前 800 字，看看注册失败提示
-
             if "login" in content.lower() or "success" in content.lower() or "成功" in content:
                 return True, username, password
             else:
+                print("❌ 页面内容未显示成功关键字")
                 return False, None, None
 
     except Exception as e:
