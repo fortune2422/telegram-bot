@@ -16,40 +16,28 @@ async def playwright_register():
 
     try:
         async with async_playwright() as p:
-            browser = await p.chromium.launch(headless=True)
+            browser = await p.chromium.launch(
+                headless=True,
+                args=["--no-sandbox", "--disable-gpu"]
+            )
             context = await browser.new_context()
             page = await context.new_page()
 
-            await page.goto(REGISTER_URL, timeout=30000)
-            await page.wait_for_load_state("domcontentloaded")  # 等待 DOM 加载完成
-            print("📄 当前页面 URL:", page.url)
+            await page.goto(REGISTER_URL, timeout=20000)
 
-            # 填写表单字段
-            try:
-                await page.wait_for_selector('input[name="username"]', timeout=15000)
-                await page.fill('input[name="username"]', username)
-            except Exception as e:
-                print("❌ 找不到 username 输入框:", e)
-                return False, None, None
-
+            await page.fill('input[name="username"]', username)
             await page.fill('input[name="password"]', password)
             await page.fill('input[name="checkPass"]', password)
 
-            # 提交按钮
-            try:
-                await page.wait_for_selector("button.submit_btn", timeout=10000)
-                await page.click("button.submit_btn")
-            except Exception as e:
-                print("❌ 找不到提交按钮:", e)
-                return False, None, None
+            await page.wait_for_selector("button.submit_btn", timeout=5000)
+            await page.click("button.submit_btn")
 
-            # 等待注册成功跳转或响应
-            await page.wait_for_timeout(3000)
+            await page.wait_for_timeout(2000)
+
             content = await page.content()
             if "login" in content.lower() or "success" in content.lower() or "成功" in content:
                 return True, username, password
             else:
-                print("❌ 页面内容未显示成功关键字")
                 return False, None, None
 
     except Exception as e:
@@ -57,8 +45,10 @@ async def playwright_register():
         return False, None, None
 
     finally:
-        if browser:
+        try:
             await browser.close()
+        except:
+            pass
 
 async def playwright_check_info(username: str, password: str):
     browser = None
