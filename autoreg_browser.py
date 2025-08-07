@@ -1,4 +1,5 @@
 # autoreg_browser.py
+import concurrent.futures
 import random, string, asyncio
 from playwright.async_api import async_playwright
 
@@ -100,4 +101,7 @@ async def playwright_check_info(username: str, password: str):
         print("❌ playwright_check_info 报错:", e)
         return None
 
+executor = concurrent.futures.ThreadPoolExecutor()
 
+def run_in_thread(coro):
+    return asyncio.get_event_loop().run_in_executor(executor, lambda: asyncio.run(coro))
