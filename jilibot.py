@@ -149,8 +149,13 @@ async def callback_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
 async def handle_text(update: Update, context: ContextTypes.DEFAULT_TYPE):
     text = update.message.text.strip().lower()
 
-    if any(kw in text for kw in ["criar conta automaticamente", "register", "registar", "account", "注册", "conta", "criar conta"]):
-        await auto_register(update, context)  # ✅ 用 Playwright 方式（即 autoreg_browser.py 中的实现）
+     if text == "🧾 criar conta automaticamente":
+        await auto_register(update, context)
+
+    elif text == "🎮 registre uma conta":
+        keyboard = [[InlineKeyboardButton("🎮 Clique aqui para registrar", url=REGISTER_URL)]]
+        reply_markup = InlineKeyboardMarkup(keyboard)
+        await update.message.reply_text("🎮 Clique abaixo para registrar manualmente 👇", reply_markup=reply_markup)
 
     elif "site" in text or text.startswith("/site"):
         keyboard = [[InlineKeyboardButton("🟢 Acessar site oficial", url=OFFICIAL_URL)]]
