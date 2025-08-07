@@ -1,4 +1,4 @@
-from autoreg_browser import playwright_check_info, playwright_register
+from autoreg_browser import playwright_register
 from account_storage import save_account, is_registered
 from account_storage import load_account 
 from telegram import (
@@ -99,7 +99,6 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
         [KeyboardButton("🎮 Registre uma conta"), KeyboardButton("🧾 Criar conta automaticamente")],
         [KeyboardButton("🟢 Link do site oficial"),KeyboardButton("🧑‍💼 atendimento ao Cliente")],
         [KeyboardButton("📱 ANDROID DOWNLOAD"), KeyboardButton("🍏 IOS DOWNLOAD")],
-        [KeyboardButton("💰 Ver saldo")],
     ]
     reply_markup = ReplyKeyboardMarkup(reply_keyboard, resize_keyboard=True)
 
@@ -123,7 +122,6 @@ async def set_bot_commands(application):
         BotCommand("cliente", "🧑‍💼 atendimento ao Cliente"),
         BotCommand("android", "📱 Android"),
         BotCommand("ios", "🍏 iOS"),
-        BotCommand("balance", "💰 Ver saldo da conta"),
     ]
     await application.bot.set_my_commands(commands)
     print("✅ 菜单命令已设置")
@@ -174,13 +172,6 @@ async def handle_text(update: Update, context: ContextTypes.DEFAULT_TYPE):
         reply_markup = InlineKeyboardMarkup(keyboard)
         await update.message.reply_text("🍏 iOS Download:\nClique abaixo para baixar 👇", reply_markup=reply_markup)
         
-    elif "saldo" in text or text.startswith("/balance"):
-        await balance_command(update, context)
-    else:
-        await update.message.reply_text("❓ Comando não reconhecido. Por favor, use os botões ou comandos disponíveis.")
-
-
-
 async def keep_alive():
     while True:
         try:
@@ -208,30 +199,6 @@ async def post_init(application):
     print("✅ OPEN 按钮已设置")  # 可选调试日志
  # ✅ 启动 keep-alive 任务（定时 ping Render，避免挂起）
     asyncio.create_task(keep_alive())
-    
-async def balance_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    user_id = update.effective_user.id
-
-    # ✅ 使用 JSON 文件判断是否已注册
-    if not is_registered(user_id):
-        await update.message.reply_text("❌ Você ainda não criou uma conta. Por favor, registre-se primeiro.")
-        return
-
-    # ✅ 从 JSON 读取账号信息
-    username, password = load_account(user_id)
-
-    try:
-        info = await playwright_check_info(username, password)
-
-        await update.message.reply_text(
-            f"💰 Saldo atual: `{info['balance']}`\n🔗 Link de convite: {info['invite_url']}",
-            parse_mode="Markdown"
-        )
-
-    except Exception as e:
-        print("❌ playwright_check_info 执行失败:", e)
-        await update.message.reply_text("⚠️ Falha ao consultar informações. Tente novamente mais tarde.")
-
 
 # 主程序
 if __name__ == "__main__":
@@ -246,7 +213,6 @@ if __name__ == "__main__":
     app.add_handler(CommandHandler("ios", handle_text))
     app.add_handler(CommandHandler("autoreg", auto_register))
     app.add_handler(CallbackQueryHandler(callback_handler))
-    app.add_handler(CommandHandler("balance", balance_command))
 
     # 文本按钮 handler
     app.add_handler(MessageHandler(filters.TEXT & ~filters.COMMAND, handle_text))
