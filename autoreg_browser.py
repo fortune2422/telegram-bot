@@ -48,59 +48,6 @@ async def playwright_register():
         print("❌ 注册失败:", e)
         return False, None, None
 
-async def playwright_check_info(username: str, password: str):
-    print(f"🔐 正在使用 {username}/{password} 登录查询余额...")
-
-    try:
-        async with async_playwright() as p:
-            browser = await p.chromium.launch(headless=True)
-            context = await browser.new_context()
-            page = await context.new_page()
-
-            await page.goto(LOGIN_URL, timeout=30000)
-
-            await page.wait_for_selector('input[name="username"]', timeout=10000)
-            await page.wait_for_selector('input[name="password"]', timeout=10000)
-
-            await page.fill('input[name="username"]', username)
-            await page.fill('input[name="password"]', password)
-            await page.click('button[type="submit"]')
-
-            await page.wait_for_timeout(3000)
-
-            if "login" in page.url:
-                print("❌ 登录失败：仍然停留在登录页面")
-                return None
-
-            content = await page.content()
-            print("🔍 登录后页面内容部分：")
-            print(content[:1000])
-
-            # 读取余额
-            try:
-                await page.wait_for_selector("span.balance", timeout=5000)
-                balance = await page.text_content("span.balance")
-            except:
-                print("❌ 未找到 balance 元素")
-                balance = "N/A"
-
-            # 读取邀请链接
-            try:
-                await page.wait_for_selector("input#address", timeout=5000)
-                invite_url = await page.get_attribute("input#address", "value")
-            except:
-                print("❌ 未找到 invite_url 元素")
-                invite_url = "N/A"
-
-            return {
-                "balance": (balance or "N/A").strip(),
-                "invite_url": (invite_url or "N/A").strip()
-            }
-
-    except Exception as e:
-        print("❌ playwright_check_info 报错:", e)
-        return None
-
 executor = concurrent.futures.ThreadPoolExecutor()
 
 def run_in_thread(coro):
