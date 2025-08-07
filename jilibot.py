@@ -149,8 +149,8 @@ async def callback_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
 async def handle_text(update: Update, context: ContextTypes.DEFAULT_TYPE):
     text = update.message.text.strip().lower()
 
-     if text == "🧾 criar conta automaticamente":
-        await auto_register(update, context)
+    if text == "🧾 criar conta automaticamente":
+         await auto_register(update, context)
 
     elif text == "🎮 registre uma conta":
         keyboard = [[InlineKeyboardButton("🎮 Clique aqui para registrar", url=REGISTER_URL)]]
