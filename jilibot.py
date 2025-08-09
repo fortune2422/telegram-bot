@@ -38,9 +38,6 @@ IOS_DOWNLOAD_URL = "https://images.6929183.com/wsd-images-prod/jili707f2/merchan
 ANDROID_DOWNLOAD_URL = "https://images.847830.com/wsd-images-prod/jili707f2/merchant_resource/android/jili707f2_2.4.68_20250725002907.apk"
 
 async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    await update.message.reply_text(
-        "Digite 'register' ou clique no botão abaixo para informações do registro."
-    )
 
     inline_keyboard = [
         [InlineKeyboardButton("🎮 Entrar no jogo", web_app=WebAppInfo(url=OFFICIAL_URL))],
@@ -62,8 +59,11 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
     reply_markup = ReplyKeyboardMarkup(reply_keyboard, resize_keyboard=True)
 
     await update.message.reply_text(
-        "Bem-vindo ao bot oficial do jili707.co.\nEscolha uma opção abaixo 👇",
-        reply_markup=reply_markup,
+        "Bem-vindo ao bot oficial do jili707.co, um produto de apostas baseado na plataforma jili707.\n"
+        "Aqui, você pode experimentar toda a emoção das apostas e ainda participar de campanhas de promoção,\n"
+        "para ganhar grandes prêmios em dinheiro.\n\n"
+        "Escolha uma opção abaixo 👇",
+        reply_markup=reply_markup
     )
 
     await update.message.reply_text("⬇️ Acesso rápido abaixo:", reply_markup=inline_markup)
