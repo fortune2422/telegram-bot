@@ -1,3 +1,2 @@
 python-telegram-bot[webhooks]==20.8
 aiohttp
-playwright==1.44.0
