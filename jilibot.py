@@ -31,8 +31,8 @@ TOKEN = "8331605813:AAFHs5vaFopD72LZOD-c1YsD4Ug2E47mbwg"
 WEBHOOK_DOMAIN = "https://telegram-bot-45rt.onrender.com"
 
 # URLs
-REGISTER_URL = "https://jili707.co/register"
-OFFICIAL_URL = "https://jili707.co"
+REGISTER_URL = "https://jilibot.jili707vip1.com/register"
+OFFICIAL_URL = "https://jilibot.jili707vip1.com/"
 CUSTOMER_SERVICE_URL = "https://magweb.meinuoka.com/Web/im.aspx?_=t&accountid=133283"
 IOS_DOWNLOAD_URL = "https://images.6929183.com/wsd-images-prod/jili707f2/merchant_resource/mobileconfig/jili707f2_2.4.3_20250725002905.mobileconfig"
 ANDROID_DOWNLOAD_URL = "https://images.847830.com/wsd-images-prod/jili707f2/merchant_resource/android/jili707f2_2.4.68_20250725002907.apk"
@@ -59,7 +59,7 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
     reply_markup = ReplyKeyboardMarkup(reply_keyboard, resize_keyboard=True)
 
     await update.message.reply_text(
-        "Bem-vindo ao bot oficial do jili707.co, um produto de apostas baseado na plataforma jili707.\n"
+        "Bem-vindo ao bot oficial do jilibot.jili707vip1.com, um produto de apostas baseado na plataforma jili707.\n"
         "Aqui, você pode experimentar toda a emoção das apostas e ainda participar de campanhas de promoção,\n"
         "para ganhar grandes prêmios em dinheiro.\n\n"
         "Escolha uma opção abaixo 👇",
