@@ -47,7 +47,6 @@ ANDROID_DOWNLOAD_URL = "https://images.847830.com/wsd-images-prod/jili707f2/merc
 
 def get_group_menu():
     keyboard = [
-        [InlineKeyboardButton("🎮 Entrar no jogo", url=OFFICIAL_URL)],
         [InlineKeyboardButton("🟢 Link do site oficial", url=OFFICIAL_URL)],
         [InlineKeyboardButton("📝 Registre uma conta", url=REGISTER_URL)],
         [
