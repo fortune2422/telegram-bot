@@ -15,6 +15,7 @@ from telegram.ext import (
     ContextTypes,
     MessageHandler,
     filters,
+    CallbackContext,
 )
 
 import telegram
@@ -24,6 +25,13 @@ import asyncio
 
 print("🔍 当前 python-telegram-bot 版本:", telegram.__version__)
 
+GROUP_ID = -1002704459263 
+WELCOME_TEXT = """Bem-vindo ao bot oficial do jilibot.jili707vip1.com, um produto de apostas baseado na plataforma jili707.
+Aqui, você pode experimentar toda a emoção das apostas e ainda participar de campanhas de promoção,
+para ganhar grandes prêmios em dinheiro.
+
+Escolha uma opção abaixo 👇
+"""
 # Telegram Bot Token
 TOKEN = "8331605813:AAFHs5vaFopD72LZOD-c1YsD4Ug2E47mbwg"
 
@@ -37,12 +45,25 @@ CUSTOMER_SERVICE_URL = "https://magweb.meinuoka.com/Web/im.aspx?_=t&accountid=13
 IOS_DOWNLOAD_URL = "https://images.6929183.com/wsd-images-prod/jili707f2/merchant_resource/mobileconfig/jili707f2_2.4.3_20250725002905.mobileconfig"
 ANDROID_DOWNLOAD_URL = "https://images.847830.com/wsd-images-prod/jili707f2/merchant_resource/android/jili707f2_2.4.68_20250725002907.apk"
 
+def get_group_menu():
+    keyboard = [
+        [InlineKeyboardButton("🎮 Entrar no jogo", web_app=WebAppInfo(url=OFFICIAL_URL))],
+        [InlineKeyboardButton("🟢 Link do site oficial", url=OFFICIAL_URL)],
+        [InlineKeyboardButton("📝 Registre uma conta", url=REGISTER_URL)],
+        [
+            InlineKeyboardButton("🍏 iOS Download", url=IOS_DOWNLOAD_URL),
+            InlineKeyboardButton("📱 Android Download", url=ANDROID_DOWNLOAD_URL)
+        ],
+        [InlineKeyboardButton("🧑‍💼 atendimento ao Cliente", url=CUSTOMER_SERVICE_URL)]
+    ]
+    return InlineKeyboardMarkup(keyboard)
+
 async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
     inline_keyboard = [
         [InlineKeyboardButton("🎮 Entrar no jogo", web_app=WebAppInfo(url=OFFICIAL_URL))],
         [InlineKeyboardButton("🟢 Link do site oficial", url=OFFICIAL_URL)],
-        [InlineKeyboardButton("🎮 Registre uma conta", url=REGISTER_URL)],
+        [InlineKeyboardButton("📝 Registre uma conta", url=REGISTER_URL)],
         [
             InlineKeyboardButton("🍏 iOS Download", url=IOS_DOWNLOAD_URL),
             InlineKeyboardButton("📱 Android Download", url=ANDROID_DOWNLOAD_URL),
@@ -118,6 +139,12 @@ async def handle_text(update: Update, context: ContextTypes.DEFAULT_TYPE):
     # 其他未识别
     await update.message.reply_text("❓ Comando não reconhecido. Por favor, use os botões ou comandos disponíveis.")
 
+async def send_group_message(context: ContextTypes.DEFAULT_TYPE):
+    await context.bot.send_message(
+        chat_id=GROUP_ID,
+        text=WELCOME_TEXT,
+        reply_markup=get_group_menu()
+    )
 
 async def keep_alive():
     while True:
@@ -138,6 +165,8 @@ async def post_init(application):
     )
     print("✅ OPEN 按钮已设置")
     asyncio.create_task(keep_alive())
+    
+    application.job_queue.run_repeating(send_group_message, interval=3600, first=5)
 
 
 if __name__ == "__main__":
