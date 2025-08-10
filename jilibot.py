@@ -102,6 +102,9 @@ async def set_bot_commands(application):
 
 
 async def handle_text(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    if update.message.chat.type != "private":
+        return  # 群聊、超级群、频道都直接忽略
+        
     text = update.message.text.strip().lower()
 
     # 如果用户点击或发送“注册”相关文字 — 显示注册链接
