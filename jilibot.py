@@ -109,19 +109,19 @@ async def handle_text(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
     # 如果用户点击或发送“注册”相关文字 — 显示注册链接
     if any(kw in text for kw in ["registe", "register", "registr", "注册", "conta"]):
-        keyboard = [[InlineKeyboardButton("🎮 Clique aqui para registrar", url=REGISTER_URL)]]
+        keyboard = [[InlineKeyboardButton("🎮 Clique aqui para registrar", web_app=WebAppInfo(url=REGISTER_URL)]]
         reply_markup = InlineKeyboardMarkup(keyboard)
         await update.message.reply_text("🎮 Clique abaixo para registrar manualmente 👇", reply_markup=reply_markup)
         return
 
     if "site" in text or text.startswith("/site"):
-        keyboard = [[InlineKeyboardButton("🟢 Acessar site oficial", url=OFFICIAL_URL)]]
+        keyboard = [[InlineKeyboardButton("🟢 Acessar site oficial", web_app=WebAppInfo(url=OFFICIAL_URL)]]
         reply_markup = InlineKeyboardMarkup(keyboard)
         await update.message.reply_text("🟢 Link do site oficial:\nClique abaixo para acessar 👇", reply_markup=reply_markup)
         return
 
     if "cliente" in text or text.startswith("/cliente"):
-        keyboard = [[InlineKeyboardButton("🧑‍💼 Falar com o suporte", url=CUSTOMER_SERVICE_URL)]]
+        keyboard = [[InlineKeyboardButton("🧑‍💼 Falar com o suporte", web_app=WebAppInfo(url=CUSTOMER_SERVICE_URL)]]
         reply_markup = InlineKeyboardMarkup(keyboard)
         await update.message.reply_text("🧑‍💼 Atendimento ao Cliente:\nClique abaixo para falar com o suporte 👇", reply_markup=reply_markup)
         return
